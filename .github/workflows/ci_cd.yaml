@@ -93,3 +93,34 @@ jobs:
       if: success()
       run: |
         docker push 739275446561.dkr.ecr.ap-south-1.amazonaws.com/prashant-mlops-ecr:latest
+
+
+
+    # Zip the required files
+    - name: Zip files for deployment
+      if: success()
+      run: |
+        zip -r deployment.zip appspec.yml deploy/scripts/install_dependencies.sh deploy/scripts/start_docker.sh
+
+
+    # Upload the ZIP file to S3
+    - name: Upload ZIP to S3
+      if: success()
+      run: |
+        aws s3 cp deployment.zip s3://prashant-mlops-bucket/deployment.zip
+
+
+    # create a deployment under a deployment group in AWS CodeDeploy -- No need to create deployment from AWS UI manually
+    - name: Deploy to AWS CodeDeploy
+      if: success()
+      run: |
+        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws deploy create-deployment \
+          --application-name UsedCarPricePredictorV1 \
+          --deployment-config-name CodeDeployDefault.AllAtOnce \
+          --deployment-group-name UsedCarPricePredictorDeploymentGroup \
+          --s3-location bucket=prashant-mlops-bucket,key=deployment.zip,bundleType=zip \
+          --file-exists-behavior OVERWRITE \
+          --region ap-south-1
+        

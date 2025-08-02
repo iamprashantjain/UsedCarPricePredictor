@@ -134,7 +134,7 @@
     - login ecr, build image, tag & push (as per show push commands)
 
 
-**Add CD**
+**Add CD -- Continous Deployment**
 
 23. There are 2 approaches to Deploy the Docker image on EC2:
     1. Direct Deployment on EC2 Instance (Single Instance):
@@ -147,7 +147,7 @@
         - Version Updates & Roll backs V1 to V2 or V2 to V1 -- BlueGreen deployment        
         - We will use **CodeDeploy** to handle all these challenges
 
-    2. Deployment on EC2 Using AWS CodeDeploy (Multi Instance):
+    2. Deployment on EC2 Using ASG & AWS CodeDeploy (Multi Instance):
         - Automate the deployment process by integrating with AWS CodeDeploy, which manages the rollout of Docker containers on EC2.
         
         1. We will first deploy the current App
@@ -161,46 +161,39 @@
     0. Create new IAM roles
         1. ECR, S3 and CodeDeploy for ASG
         2. CodeDeploy for codedeploy service
+
     1. Create Launch Template (Its used for reproducibility & install code deploy agent)
         
         ------------------------------------------------------------------------------------------------------------------
         #!/bin/bash
 
-        set -e  # Exit immediately if a command exits with a non-zero status
-
         # Update the package list
         sudo apt-get update -y
 
-        # Install Ruby (required by CodeDeploy Agent)
+        # Install Ruby (required by the CodeDeploy agent)
         sudo apt-get install ruby -y
 
-        # Install wget if it's not already installed
-        sudo apt-get install wget -y
-
-        # Download the CodeDeploy agent installer
-        cd /home/ubuntu
-        wget https://aws-codedeploy-ap-southeast-2.s3.ap-southeast-2.amazonaws.com/latest/install -O install_codedeploy.sh
+        # Download the CodeDeploy agent installer from the correct region
+        wget https://aws-codedeploy-ap-southeast-2.s3.ap-southeast-2.amazonaws.com/latest/install
 
         # Make the installer executable
-        chmod +x ./install_codedeploy.sh
+        chmod +x ./install
 
-        # Run the installer
-        sudo ./install_codedeploy.sh auto
+        # Install the CodeDeploy agent
+        sudo ./install auto
 
-        # Enable and start the CodeDeploy agent
-        sudo systemctl enable codedeploy-agent
-        sudo systemctl start codedeploy-agent
+        # Start the CodeDeploy agent
+        sudo service codedeploy-agent start
 
-        # Check agent status
-        sudo systemctl status codedeploy-agent --no-pager
         ------------------------------------------------------------------------------------------------------------------
 
-    2. Create ASG using above launch template, Attach Loadbalancer to it.
-    3. Create CodeDeploy application
-    4. Create deployment group (attach asg with codedeploy using deployment group)
+    2. Create ASG using above launch template, Attach Loadbalancer to it -- sudo service codedeploy-agent status
+    3. Create CodeDeploy application -- "UsedCarPricePredictorV1"
+    4. Create deployment group (attach asg with codedeploy using deployment group) -- "CodeDeployServiceRole"
     5. Create appspec.yml & create a folder deploy/scripts and add 2 files:
         - install_dependencies.sh
         - start_docker.sh
+    6. once we push changes to git, It will trigger ci/cd and app will be deployed and ready to serve
 
 
 
