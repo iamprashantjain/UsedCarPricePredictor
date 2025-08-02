@@ -1,0 +1,42 @@
+mlflow:
+  repo_owner: iamprashantjain
+  repo_name: UsedCarPricePredictor
+  tracking_uri: https://dagshub.com/iamprashantjain/UsedCarPricePredictor.mlflow
+  first_exp: BaseLine Model
+
+base:
+  target_col: listingPrice
+
+data_ingestion:
+  test_size: 0.2
+  random_state: 42
+  numerical_cols:
+    - odometer
+    - fitnessAge
+    - featureCount
+  categorical_cols:
+    - make
+    - model
+    - variant
+    - year
+    - transmissionType
+    - bodyType
+    - fuelType
+    - ownership
+    - color
+
+model_trainer:
+  n_estimators: 300
+  max_depth: 6
+  learning_rate: 0.2
+  random_state: 42
+  verbosity: 0
+
+
+model_registration:
+  model_name: UsedCarPriceModel
+  register_as: "Staging"
+
+evaluation:
+  min_r2: 0.0
+  max_rmse: 100000000

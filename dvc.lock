@@ -1,0 +1,137 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/components/data_ingestion.py
+    deps:
+    - path: experiment/cars24_v3.xlsx
+      hash: md5
+      md5: 7f75aa6155a399ff8b6134f69982bce7
+      size: 1144952
+    - path: params.yaml
+      hash: md5
+      md5: 71494085111827346f429d107e67cc9c
+      size: 761
+    - path: src/components/data_ingestion.py
+      hash: md5
+      md5: b738c7cd12b6344d503fb47eeaae3d16
+      size: 2673
+    outs:
+    - path: artifacts/data_ingestion/raw.csv
+      hash: md5
+      md5: 75e32786dfcfd441cee8919a6f4ff933
+      size: 613963
+    - path: artifacts/data_ingestion/test.csv
+      hash: md5
+      md5: 8b071c1b8fd9811479cffac69f6ca2d0
+      size: 123263
+    - path: artifacts/data_ingestion/train.csv
+      hash: md5
+      md5: 27fd656a51a221fae9aafd36992e227f
+      size: 490822
+  data_transformation:
+    cmd: python src/components/data_transformation.py
+    deps:
+    - path: artifacts/data_ingestion/test.csv
+      hash: md5
+      md5: 8b071c1b8fd9811479cffac69f6ca2d0
+      size: 123263
+    - path: artifacts/data_ingestion/train.csv
+      hash: md5
+      md5: 27fd656a51a221fae9aafd36992e227f
+      size: 490822
+    - path: params.yaml
+      hash: md5
+      md5: 71494085111827346f429d107e67cc9c
+      size: 761
+    - path: src/components/data_transformation.py
+      hash: md5
+      md5: 06a5db75038e065a13f81fa657e2c4b1
+      size: 4570
+    outs:
+    - path: artifacts/data_transformation/preprocessor.pkl
+      hash: md5
+      md5: 62b187d3bb3bfae3c505fbde192319cf
+      size: 32172
+    - path: artifacts/data_transformation/test_transformed.csv
+      hash: md5
+      md5: d0c0af9969d004eeff9aab7552fb6570
+      size: 10383704
+    - path: artifacts/data_transformation/train_transformed.csv
+      hash: md5
+      md5: 8f367a79f16f20c269a461dbe473e0ea
+      size: 41484120
+  model_trainer:
+    cmd: python src/components/model_trainer.py
+    deps:
+    - path: artifacts/data_transformation/preprocessor.pkl
+      hash: md5
+      md5: 62b187d3bb3bfae3c505fbde192319cf
+      size: 32172
+    - path: artifacts/data_transformation/train_transformed.csv
+      hash: md5
+      md5: 8f367a79f16f20c269a461dbe473e0ea
+      size: 41484120
+    - path: params.yaml
+      hash: md5
+      md5: 71494085111827346f429d107e67cc9c
+      size: 761
+    - path: src/components/model_trainer.py
+      hash: md5
+      md5: 17c031a27bca05bcda9b30911bfb54de
+      size: 4429
+    outs:
+    - path: artifacts/model_trainer/model.pkl
+      hash: md5
+      md5: 64a3c8d307e0e3287c66bcc7fd4a56ba
+      size: 611740
+  model_evaluation:
+    cmd: python src/components/model_evaluation.py
+    deps:
+    - path: artifacts/data_ingestion/test.csv
+      hash: md5
+      md5: 8b071c1b8fd9811479cffac69f6ca2d0
+      size: 123263
+    - path: artifacts/model_trainer/model.pkl
+      hash: md5
+      md5: 64a3c8d307e0e3287c66bcc7fd4a56ba
+      size: 611740
+    - path: params.yaml
+      hash: md5
+      md5: 71494085111827346f429d107e67cc9c
+      size: 761
+    - path: src/components/model_evaluation.py
+      hash: md5
+      md5: d284825a146d3c2240641af4a9f91a81
+      size: 14661
+    outs:
+    - path: artifacts/model_evaluation/best_model.pkl
+      hash: md5
+      md5: d501d21a5bf44a4d46d894e06939ea6a
+      size: 611746
+    - path: artifacts/model_evaluation/evaluation_info.json
+      hash: md5
+      md5: 83914d124c108019940e644e837fdc13
+      size: 151
+    - path: artifacts/model_evaluation/metrics.yaml
+      hash: md5
+      md5: d2809456355a18420bed1cefd914d30d
+      size: 55
+  register_model:
+    cmd: python src/components/register_model.py
+    deps:
+    - path: artifacts/model_evaluation/evaluation_info.json
+      hash: md5
+      md5: 83914d124c108019940e644e837fdc13
+      size: 151
+    - path: artifacts/model_evaluation/metrics.yaml
+      hash: md5
+      md5: d2809456355a18420bed1cefd914d30d
+      size: 55
+    - path: params.yaml
+      hash: md5
+      md5: 71494085111827346f429d107e67cc9c
+      size: 761
+    - path: src/components/register_model.py
+      hash: md5
+      md5: 24cc03d55d6bd1cb6d25cab4a37d6b6d
+      size: 7636

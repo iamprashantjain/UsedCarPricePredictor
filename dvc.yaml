@@ -1,0 +1,76 @@
+stages:
+  data_ingestion:
+    cmd: python src/components/data_ingestion.py
+    deps:
+      - src/components/data_ingestion.py
+      - experiment/cars24_v3.xlsx
+      - params.yaml
+    outs:
+      - artifacts/data_ingestion/raw.csv
+      - artifacts/data_ingestion/train.csv
+      - artifacts/data_ingestion/test.csv
+
+  data_transformation:
+    cmd: python src/components/data_transformation.py
+    deps:
+      - src/components/data_transformation.py
+      - artifacts/data_ingestion/train.csv
+      - artifacts/data_ingestion/test.csv
+      - params.yaml
+    outs:
+      - artifacts/data_transformation/train_transformed.csv
+      - artifacts/data_transformation/test_transformed.csv
+      - artifacts/data_transformation/preprocessor.pkl
+
+  model_trainer:
+    cmd: python src/components/model_trainer.py
+    deps:
+      - src/components/model_trainer.py
+      - artifacts/data_transformation/train_transformed.csv
+      - artifacts/data_transformation/preprocessor.pkl
+      - params.yaml
+    outs:
+      - artifacts/model_trainer/model.pkl
+
+  model_evaluation:
+    cmd: python src/components/model_evaluation.py
+    deps:
+      - src/components/model_evaluation.py
+      - artifacts/model_trainer/model.pkl
+      - artifacts/data_ingestion/test.csv
+      - params.yaml
+    outs:
+      - artifacts/model_evaluation/metrics.yaml
+      - artifacts/model_evaluation/best_model.pkl
+      - artifacts/model_evaluation/evaluation_info.json
+
+
+  register_model:
+    cmd: python src/components/register_model.py
+    deps:
+      - src/components/register_model.py
+      - artifacts/model_evaluation/evaluation_info.json
+      - artifacts/model_evaluation/metrics.yaml
+      - params.yaml
+
+
+
+  # perform model testing and promotion outside of DVC, in GitHub Actions bcoz DVC is a great tool for tracking data and managing deterministic pipelines
+  # But model promotion and testing involve business logic, model governance, and external system interaction
+
+
+  # test_model:
+  #   cmd: python tests/test_model.py
+  #   deps:
+  #     - tests/test_model.py
+  #     - artifacts/data_ingestion/test.csv
+  #     - params.yaml
+  #   outs:
+  #     - artifacts/test_model/test_model_status.txt
+
+  
+  # promote_model:
+  #   cmd: python src/components/promote_model.py
+  #   deps:
+  #     - src/components/promote_model.py
+  #     - artifacts/test_model/test_model_status.txt
