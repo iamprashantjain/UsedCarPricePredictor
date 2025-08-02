@@ -8,9 +8,12 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import yaml
 from fastapi.responses import JSONResponse
+from pathlib import Path
 
-# Load config
-with open("params.yaml", "r") as f:
+# Resolve path to params.yaml regardless of working dir
+params_path = Path(__file__).resolve().parent.parent / "params.yaml"
+
+with params_path.open("r") as f:
     params = yaml.safe_load(f)
 
 repo_owner = params["mlflow"]["repo_owner"]

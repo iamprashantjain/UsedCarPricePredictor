@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+pandas
+pydantic
+pyyaml
+mlflow==2.2.2
+xgboost
+scikit-learn
+numpy
+psutil
+scipy

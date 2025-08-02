@@ -123,17 +123,20 @@
 **Dockerize FastAPI**
 
 19. Create dockerfile
+    - make minimalistic image which will only have requirements & dependencies to run api -- no need to dockerize complete project folder
 20. Create docker image of the app using Dockerfile
 21. Test run it on local system, If runs successfully then add it to CI/CD pipeline
 
     - FOR /F "tokens=*" %i IN ('docker ps -aq') DO docker rm -f %i & FOR /F "tokens=*" %i IN ('docker images -aq') DO docker rmi -f %i & FOR /F "tokens=*" %i IN ('docker volume ls -q') DO docker volume rm %i & docker system prune -a --volumes --force
-    - docker build -t used-car-price-container .
-    - docker run -it -p 8000:8000 --name used-car-container -e DAGSHUB_PAT=3fa766b6d55fd522dade3b35cf9131bd4c0c9a62 used-car-price-container
+    - docker build -t used-car-price-container . && docker run -it -p 8000:8000 --rm --name used-car-container -e DAGSHUB_PAT=7bed6b5be2021b1a4eaae221787bcb048ab2bcfd used-car-price-container
+
+22. Add Creating Docker image and push image to Docker in CI
+    - login ecr, build image, tag & push (as per show push commands)
 
 
 **Add CD**
 
-22. There are 2 approaches to Deploy the Docker image on EC2:
+23. There are 2 approaches to Deploy the Docker image on EC2:
     1. Direct Deployment on EC2 Instance (Single Instance):
         - Manually set up and run the Docker container directly on the EC2 instance.
         
@@ -153,7 +156,7 @@
         4. Test rollback from V2 → V1 using CodeDeploy’s Blue/Green deployment capabilities.
 
 
-23. **Workflow to Deploy App using Codedeploy + BlueGreen Deployment Strategy**
+24. **Workflow to Deploy App using Codedeploy + BlueGreen Deployment Strategy**
     
     0. Create new IAM roles
         1. ECR, S3 and CodeDeploy for ASG
@@ -238,7 +241,13 @@
 7. file paths gives trouble bcoz docker will be on linux & project is developed on windows
 8. aws property names should match exactly: s3 bucket, group name, app name, docker image/container name etc.
 9. mlflow model registry unable to load best_model.yaml bcoz thats not the correct file -- It will not be able to parse this file, instead save it to .pkl in model_evaluation stage
-10. Currently accuracy is 85% but RSMSE is approx 2lakh+, If prices vary from ₹50,000 to ₹25 lakh, then RMSE will naturally be large. Try log transformation.
+10. Currently accuracy is 85% but RSMSE is approx 2lakh+, If prices vary from 50k to 2500k then RMSE will naturally be large. (apply log transformation in price)
     - y_train_log = np.log1p(y_train)
     - model.fit(X_train, y_train_log)
     - preds = np.expm1(model.predict(X_test))
+11. Keep same folder structure in docker image also to find every file using same code
+
+
+
+
+<!-- 7bed6b5be2021b1a4eaae221787bcb048ab2bcfd     -->

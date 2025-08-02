@@ -68,8 +68,27 @@ jobs:
 # ======================== After above ========================
 # create fastapi which fetches model from model registry & do predictions
 # dockerize the app and test locally
-# add docker image creation & push image to ECR step in CI below
+# if success: then add ci: login ecr, build image, tag & push (show push commands)
 
 
+    - name: Login to AWS ECR
+      if: success()
+      run: |
+        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 739275446561.dkr.ecr.ap-south-1.amazonaws.com
 
+    - name: Build Docker image
+      if: success()
+      run: |
+        docker build -t used-car-price-container .
 
+    - name: Tag Docker image
+      if: success()
+      run: |
+        docker tag used-car-price-container:latest 739275446561.dkr.ecr.ap-south-1.amazonaws.com/used-car-price-container:latest
+
+    - name: Push Docker image to AWS ECR
+      if: success()
+      run: |
+        docker push 739275446561.dkr.ecr.ap-south-1.amazonaws.com/used-car-price-container:latest
