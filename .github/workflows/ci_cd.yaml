@@ -69,6 +69,7 @@ jobs:
 # create fastapi which fetches model from model registry & do predictions
 # dockerize the app and test locally
 # if success: then add ci: login ecr, build image, tag & push (show push commands)
+# ecr repo name is prashant-mlops-ecr
 
 
     - name: Login to AWS ECR
@@ -81,14 +82,14 @@ jobs:
     - name: Build Docker image
       if: success()
       run: |
-        docker build -t used-car-price-container .
+        docker build -t prashant-mlops-ecr .
 
     - name: Tag Docker image
       if: success()
       run: |
-        docker tag used-car-price-container:latest 739275446561.dkr.ecr.ap-south-1.amazonaws.com/used-car-price-container:latest
+        docker tag prashant-mlops-ecr:latest 739275446561.dkr.ecr.ap-south-1.amazonaws.com/prashant-mlops-ecr:latest
 
     - name: Push Docker image to AWS ECR
       if: success()
       run: |
-        docker push 739275446561.dkr.ecr.ap-south-1.amazonaws.com/used-car-price-container:latest
+        docker push 739275446561.dkr.ecr.ap-south-1.amazonaws.com/prashant-mlops-ecr:latest
