@@ -200,20 +200,179 @@
 # =============================
 
 
+# import os
+# import sys
+# import json
+# import yaml
+# import mlflow
+# import numpy as np
+# import pandas as pd
+# from dataclasses import dataclass
+# from sklearn.metrics import r2_score, mean_squared_error
+
+# from src.logger.logging import logging
+# from src.exception.exception import customexception
+# from src.utils.utils import load_object, save_object
+
+
+# # Load config from params.yaml
+# with open("params.yaml", "r") as f:
+#     params = yaml.safe_load(f)
+
+# repo_owner = params["mlflow"]["repo_owner"]
+# repo_name = params["mlflow"]["repo_name"]
+
+# # Set up MLflow to use DagsHub
+# dagshub_token = os.getenv("DAGSHUB_PAT")
+# if not dagshub_token:
+#     raise EnvironmentError("DAGSHUB_PAT environment variable is not set")
+
+# os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+# os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
+# mlflow.set_tracking_uri(f"https://dagshub.com/{repo_owner}/{repo_name}.mlflow")
+
+
+# @dataclass
+# class ModelEvaluationConfig:
+#     test_data_path: str = os.path.join("artifacts", "data_ingestion", "test.csv")
+#     model_path: str = os.path.join("artifacts", "model_trainer", "model.pkl")
+#     metrics_path: str = os.path.join("artifacts", "model_evaluation", "metrics.yaml")
+#     evaluation_info_path: str = os.path.join("artifacts", "model_evaluation", "evaluation_info.json")
+#     best_model_local_path: str = os.path.join("artifacts", "model_evaluation", "best_model.pkl")
+#     experiment_name: str = "Used_Car_Price_Predictor_Experiment"
+#     run_name: str = "Model_Evaluation_Run"
+
+
+# class ModelEvaluation:
+#     def __init__(self):
+#         self.config = ModelEvaluationConfig()
+#         try:
+#             with open("params.yaml", "r") as f:
+#                 self.params = yaml.safe_load(f)
+#             self.target_column = self.params["base"]["target_col"]
+#         except Exception as e:
+#             raise customexception(e, sys)
+
+#     def load_test_data(self):
+#         try:
+#             df = pd.read_csv(self.config.test_data_path)
+#             X_test = df.drop(columns=[self.target_column])
+#             y_test = df[self.target_column]
+#             return X_test, y_test
+#         except Exception as e:
+#             raise customexception(e, sys)
+
+#     def evaluate_model(self, model, X_test, y_test):
+#         try:
+#             y_pred = model.predict(X_test)
+#             r2 = r2_score(y_test, y_pred)
+#             rmse = np.sqrt(mean_squared_error(y_test, y_pred))
+#             return r2, rmse
+#         except Exception as e:
+#             raise customexception(e, sys)
+
+#     def save_metrics(self, r2, rmse):
+#         try:
+#             os.makedirs(os.path.dirname(self.config.metrics_path), exist_ok=True)
+#             with open(self.config.metrics_path, "w") as f:
+#                 yaml.dump({"r2_score": float(r2), "rmse": float(rmse)}, f)
+#         except Exception as e:
+#             raise customexception(e, sys)
+
+#     def save_best_model_locally(self, model, r2, best_score):
+#         try:
+#             if best_score is None or r2 > best_score:
+#                 os.makedirs(os.path.dirname(self.config.best_model_local_path), exist_ok=True)
+#                 save_object(self.config.best_model_local_path, model)
+#                 return True
+#             return False
+#         except Exception as e:
+#             raise customexception(e, sys)
+
+#     def get_previous_best_score(self):
+#         try:
+#             if not os.path.exists(self.config.metrics_path):
+#                 return None
+#             with open(self.config.metrics_path, "r") as f:
+#                 return yaml.safe_load(f).get("r2_score")
+#         except Exception as e:
+#             raise customexception(e, sys)
+
+#     def save_evaluation_info(self, run_id, registered):
+#         try:
+#             os.makedirs(os.path.dirname(self.config.evaluation_info_path), exist_ok=True)
+#             with open(self.config.evaluation_info_path, "w") as f:
+#                 json.dump({
+#                     "run_id": run_id,
+#                     "metrics_path": self.config.metrics_path,
+#                     "model_registered": registered
+#                 }, f, indent=4)
+#         except Exception as e:
+#             raise customexception(e, sys)
+
+#     def initiate_model_evaluation(self):
+#         try:
+#             logging.info("Starting model evaluation...")
+#             X_test, y_test = self.load_test_data()
+#             model = load_object(self.config.model_path)
+
+#             mlflow.set_experiment(self.config.experiment_name)
+
+#             with mlflow.start_run(run_name=self.config.run_name) as run:
+#                 r2, rmse = self.evaluate_model(model, X_test, y_test)
+
+#                 mlflow.log_metric("r2_score", r2)
+#                 mlflow.log_metric("rmse", rmse)
+
+#                 mlflow.sklearn.log_model(model, "model")
+
+#                 best_score = self.get_previous_best_score()
+#                 is_better = self.save_best_model_locally(model, r2, best_score)
+
+#                 self.save_metrics(r2, rmse)
+
+#                 registered = False
+#                 if is_better:
+#                     logging.info("New model is better. Registering...")
+#                     mlflow.register_model(
+#                         model_uri=f"runs:/{run.info.run_id}/model",
+#                         name="UsedCarPriceModel"
+#                     )
+#                     registered = True
+#                 else:
+#                     logging.info("New model is not better. Skipping registration.")
+
+#                 self.save_evaluation_info(run.info.run_id, registered)
+
+#             logging.info("Model evaluation completed successfully.")
+#             return r2, rmse, registered
+
+#         except Exception as e:
+#             raise customexception(e, sys)
+
+
+# if __name__ == "__main__":
+#     evaluator = ModelEvaluation()
+#     r2, rmse, registered = evaluator.initiate_model_evaluation()
+#     print(f"R2: {r2:.4f}, RMSE: {rmse:.2f}, Registered: {registered}")
+
+# ========================================
+
 import os
 import sys
 import json
 import yaml
+import time
 import mlflow
 import numpy as np
 import pandas as pd
 from dataclasses import dataclass
 from sklearn.metrics import r2_score, mean_squared_error
+from mlflow.tracking import MlflowClient
 
 from src.logger.logging import logging
 from src.exception.exception import customexception
 from src.utils.utils import load_object, save_object
-
 
 # Load config from params.yaml
 with open("params.yaml", "r") as f:
@@ -221,6 +380,7 @@ with open("params.yaml", "r") as f:
 
 repo_owner = params["mlflow"]["repo_owner"]
 repo_name = params["mlflow"]["repo_name"]
+model_name = params["model_registration"]["model_name"]
 
 # Set up MLflow to use DagsHub
 dagshub_token = os.getenv("DAGSHUB_PAT")
@@ -281,7 +441,7 @@ class ModelEvaluation:
 
     def save_best_model_locally(self, model, r2, best_score):
         try:
-            if best_score is None or r2 > best_score:
+            if best_score is None or r2 >= best_score:                                                      #change this in production
                 os.makedirs(os.path.dirname(self.config.best_model_local_path), exist_ok=True)
                 save_object(self.config.best_model_local_path, model)
                 return True
@@ -298,18 +458,20 @@ class ModelEvaluation:
         except Exception as e:
             raise customexception(e, sys)
 
-    def save_evaluation_info(self, run_id, registered):
+    def save_evaluation_info(self, run_id, registered, model_version=None):
         try:
             os.makedirs(os.path.dirname(self.config.evaluation_info_path), exist_ok=True)
             with open(self.config.evaluation_info_path, "w") as f:
                 json.dump({
                     "run_id": run_id,
                     "metrics_path": self.config.metrics_path,
-                    "model_registered": registered
+                    "model_registered": registered,
+                    "model_version": model_version
                 }, f, indent=4)
         except Exception as e:
             raise customexception(e, sys)
 
+    
     def initiate_model_evaluation(self):
         try:
             logging.info("Starting model evaluation...")
@@ -332,17 +494,37 @@ class ModelEvaluation:
                 self.save_metrics(r2, rmse)
 
                 registered = False
+                model_version = None
+
                 if is_better:
                     logging.info("New model is better. Registering...")
-                    mlflow.register_model(
+
+                    # Register the model
+                    result = mlflow.register_model(
                         model_uri=f"runs:/{run.info.run_id}/model",
-                        name="UsedCarPriceModel"
+                        name=model_name
                     )
+                    model_version = result.version
+                    logging.info(f"Model registered with version: {model_version}")
+
+                    # Wait briefly for registry sync
+                    time.sleep(5)
+
+                    # Promote to Staging
+                    client = MlflowClient()
+                    client.transition_model_version_stage(
+                        name=model_name,
+                        version=model_version,
+                        stage="Staging",
+                        archive_existing_versions=True
+                    )
+                    logging.info(f"Model version {model_version} promoted to 'Staging'.")
+
                     registered = True
                 else:
                     logging.info("New model is not better. Skipping registration.")
 
-                self.save_evaluation_info(run.info.run_id, registered)
+                self.save_evaluation_info(run.info.run_id, registered, model_version)
 
             logging.info("Model evaluation completed successfully.")
             return r2, rmse, registered
@@ -354,4 +536,4 @@ class ModelEvaluation:
 if __name__ == "__main__":
     evaluator = ModelEvaluation()
     r2, rmse, registered = evaluator.initiate_model_evaluation()
-    print(f"R2: {r2:.4f}, RMSE: {rmse:.2f}, Registered: {registered}")
+    print(f"R2: {r2:.4f}, RMSE: {rmse:.2f}, Registered & Promoted to Staging: {registered}")

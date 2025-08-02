@@ -77,8 +77,8 @@ stages:
       size: 761
     - path: src/components/model_trainer.py
       hash: md5
-      md5: 17c031a27bca05bcda9b30911bfb54de
-      size: 4429
+      md5: 163809e90982f70563f152d0683343c0
+      size: 9006
     outs:
     - path: artifacts/model_trainer/model.pkl
       hash: md5
@@ -101,8 +101,8 @@ stages:
       size: 761
     - path: src/components/model_evaluation.py
       hash: md5
-      md5: d284825a146d3c2240641af4a9f91a81
-      size: 14661
+      md5: e94418a84c8f58b77282ea5a61390ba2
+      size: 21928
     outs:
     - path: artifacts/model_evaluation/best_model.pkl
       hash: md5
@@ -110,8 +110,8 @@ stages:
       size: 611746
     - path: artifacts/model_evaluation/evaluation_info.json
       hash: md5
-      md5: d37a612b6d116b9063d43c084654f286
-      size: 151
+      md5: 6f3bdd73e218e5426c5263325857dd8c
+      size: 179
     - path: artifacts/model_evaluation/metrics.yaml
       hash: md5
       md5: d2809456355a18420bed1cefd914d30d

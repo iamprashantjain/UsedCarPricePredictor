@@ -44,14 +44,20 @@ stages:
       - artifacts/model_evaluation/best_model.pkl
       - artifacts/model_evaluation/evaluation_info.json
 
+  
+  # ****************
+  # not registering model any more -- as per industry best practice: model trainer will register model to staging, evaluation success will move to staging
+  # in cicd, we will perform model testing & promote model to production on success
+  # ****************
 
-  register_model:
-    cmd: python src/components/register_model.py
-    deps:
-      - src/components/register_model.py
-      - artifacts/model_evaluation/evaluation_info.json
-      - artifacts/model_evaluation/metrics.yaml
-      - params.yaml
+
+  # register_model:
+  #   cmd: python src/components/register_model.py
+  #   deps:
+  #     - src/components/register_model.py
+  #     - artifacts/model_evaluation/evaluation_info.json
+  #     - artifacts/model_evaluation/metrics.yaml
+  #     - params.yaml
 
 
 
