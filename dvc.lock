@@ -110,7 +110,7 @@ stages:
       size: 611746
     - path: artifacts/model_evaluation/evaluation_info.json
       hash: md5
-      md5: 83914d124c108019940e644e837fdc13
+      md5: d37a612b6d116b9063d43c084654f286
       size: 151
     - path: artifacts/model_evaluation/metrics.yaml
       hash: md5
@@ -121,7 +121,7 @@ stages:
     deps:
     - path: artifacts/model_evaluation/evaluation_info.json
       hash: md5
-      md5: 83914d124c108019940e644e837fdc13
+      md5: d37a612b6d116b9063d43c084654f286
       size: 151
     - path: artifacts/model_evaluation/metrics.yaml
       hash: md5
@@ -133,5 +133,5 @@ stages:
       size: 761
     - path: src/components/register_model.py
       hash: md5
-      md5: 24cc03d55d6bd1cb6d25cab4a37d6b6d
-      size: 7636
+      md5: 7368f972b4a845d5ecd693bfab739b82
+      size: 7652

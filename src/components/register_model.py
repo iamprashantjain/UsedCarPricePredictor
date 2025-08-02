@@ -167,9 +167,9 @@ class ModelRegistration:
             model_uri = f"runs:/{model_info['run_id']}/{model_info['artifact_path']}"
             logging.info(f"Registering model from URI: {model_uri}")
 
-            # Register model
+            # Register model to None
             model_version = mlflow.register_model(model_uri, self.config.model_name)
-            logging.info(f"Model registered with version {model_version.version}")
+            logging.info(f"Model registered to None with version {model_version.version}")
 
             # Transition to Staging
             client = MlflowClient()
