@@ -245,7 +245,7 @@
     - model.fit(X_train, y_train_log)
     - preds = np.expm1(model.predict(X_test))
 11. Keep same folder structure in docker image also to find every file using same code
-
+12. Change everything to port 8000 to avoid unhealthy health checks of target group
 
 
 
