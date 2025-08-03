@@ -155,6 +155,12 @@
         3. Redeploy the updated version using CodeDeploy.
         4. Test rollback from V2 → V1 using CodeDeploy’s Blue/Green deployment capabilities.
 
+        - **Benefits**
+            - blue/green deployment strategy: zero downtime
+            - automated rollbacks if new deployment fails
+            - granular control like how many instances, health checks, pre & post deployment scripts etc
+            - seamless integration with ci/cd pipelines
+
 
 24. **Workflow to Deploy App using Codedeploy + BlueGreen Deployment Strategy**
     

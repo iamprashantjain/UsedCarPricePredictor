@@ -29,17 +29,21 @@
 
 
 # ---------- Stage 1: Builder ----------
-FROM python:3.10-alpine AS builder
+FROM python:3.10-slim AS builder
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Install build dependencies for any packages needing compilation
-RUN apk add --no-cache gcc musl-dev libffi-dev
+# Install build dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    libffi-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements and install dependencies to custom path
 COPY requirements_prod.txt .
 
 RUN pip install --no-cache-dir --upgrade pip && \
@@ -47,25 +51,24 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 
 # ---------- Stage 2: Final ----------
-FROM python:3.10-alpine
+FROM python:3.10-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 WORKDIR /app
 
-# Install only runtime dependencies
-RUN apk add --no-cache libffi
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libffi7 \
+    && rm -rf /var/lib/apt/lists/*
 
-# Copy installed Python packages from builder
+# Copy Python dependencies
 COPY --from=builder /install /usr/local
 
-# Copy application code and config
+# Copy app files
 COPY params.yaml .
 COPY app/ app/
-
-# Clean up unnecessary files
-RUN rm -rf /root/.cache /tmp/* /var/tmp/*
 
 EXPOSE 8000
 
