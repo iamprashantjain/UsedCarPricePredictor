@@ -25,6 +25,6 @@ if [ "$(docker ps -aq -f name=$CONTAINER_NAME)" ]; then
 fi
 
 echo "Starting new container..."
-docker run -d -p 80:8000 --name $CONTAINER_NAME $IMAGE_NAME
+docker run -d -p 80:8000 -e DAGSHUB_PAT=7bed6b5be2021b1a4eaae221787bcb048ab2bcfd --name $CONTAINER_NAME $IMAGE_NAME
 
 echo "Container started successfully."
