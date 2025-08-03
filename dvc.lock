@@ -110,7 +110,7 @@ stages:
       size: 611746
     - path: artifacts/model_evaluation/evaluation_info.json
       hash: md5
-      md5: 7522978bb83df0bc8335ec777eed1eff
+      md5: 7cd4d2501b3ce31a488721cff79d7119
       size: 179
     - path: artifacts/model_evaluation/metrics.yaml
       hash: md5
