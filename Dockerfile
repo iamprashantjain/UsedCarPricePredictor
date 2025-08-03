@@ -50,7 +50,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir --prefix=/install -r requirements_prod.txt
 
 
-# ---------- Stage 2: Final ----------
+# Stage 2
 FROM python:3.10-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -58,18 +58,16 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Install runtime dependencies
+# Install minimal runtime dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libffi7 \
+    libffi-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy Python dependencies
 COPY --from=builder /install /usr/local
-
-# Copy app files
 COPY params.yaml .
 COPY app/ app/
 
 EXPOSE 8000
 
 CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000", "--timeout", "120", "app.main:app"]
+
