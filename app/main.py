@@ -81,6 +81,12 @@ class CarFeatures(BaseModel):
 def home():
     return {"message": "Used Car Price Predictor API - Prashant Jain"}
 
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+
 @app.post("/predict")
 def predict(data: CarFeatures):
     df = pd.DataFrame([data.dict()])

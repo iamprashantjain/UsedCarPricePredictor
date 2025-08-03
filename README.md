@@ -240,12 +240,12 @@
 7. file paths gives trouble bcoz docker will be on linux & project is developed on windows
 8. aws property names should match exactly: s3 bucket, group name, app name, docker image/container name etc.
 9. mlflow model registry unable to load best_model.yaml bcoz thats not the correct file -- It will not be able to parse this file, instead save it to .pkl in model_evaluation stage
-10. Currently accuracy is 85% but RSMSE is approx 2lakh+, If prices vary from 50k to 2500k then RMSE will naturally be large. (apply log transformation in price)
+10. In V2 of the model we can do following changes, Currently accuracy is 85% but RSMSE is approx 2lakh+, If prices vary from 50k to 2500k then RMSE will naturally be large. (apply log transformation in price)
     - y_train_log = np.log1p(y_train)
     - model.fit(X_train, y_train_log)
     - preds = np.expm1(model.predict(X_test))
 11. Keep same folder structure in docker image also to find every file using same code
-12. Change everything to port 8000 to avoid unhealthy health checks of target group
+12. api app should have home route ("/") because aws uses that to validate
 
 
 
