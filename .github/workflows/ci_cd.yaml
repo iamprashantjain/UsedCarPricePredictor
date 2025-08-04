@@ -96,11 +96,12 @@ jobs:
 
 
 
-    # Zip the required files
+    # Zip the required files (updated to zip wait_for_health also)
     - name: Zip files for deployment
       if: success()
       run: |
-        zip -r deployment.zip appspec.yml deploy/scripts/install_dependencies.sh deploy/scripts/start_docker.sh
+        zip -r deployment.zip appspec.yml deploy/scripts/install_dependencies.sh deploy/scripts/start_docker.sh deploy/scripts/wait_for_health.sh
+
 
 
     # Upload the ZIP file to S3
@@ -117,9 +118,9 @@ jobs:
         aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws deploy create-deployment \
-          --application-name UsedCarPricePredcitor3Augv2app \
+          --application-name used-car-price-predictor-app-4aug \
           --deployment-config-name CodeDeployDefault.AllAtOnce \
-          --deployment-group-name UsedCarPricePredcitor3Augv2appDeploymentGroup \
+          --deployment-group-name used-car-price-predictor-app-4aug-deployment-group \
           --s3-location bucket=prashant-mlops-bucket,key=deployment.zip,bundleType=zip \
           --file-exists-behavior OVERWRITE \
           --region ap-south-1

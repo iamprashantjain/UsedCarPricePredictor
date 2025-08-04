@@ -12,3 +12,6 @@ hooks:
     - location: deploy/scripts/start_docker.sh
       timeout: 300
       runas: ubuntu
+    - location: deploy/scripts/wait_for_health.sh
+      timeout: 120
+      runas: ubuntu

@@ -246,7 +246,7 @@
     - preds = np.expm1(model.predict(X_test))
 11. Keep same folder structure in docker image also to find every file using same code
 12. api app should have home route ("/") because aws uses that to validate
-
+13. App needs some time to fully start like downloading model from mlflow etc, but health checks happen immediately thats why target group health check fails -- add wait_for_health.sh & update cicd zip
 
 
 <!-- 7bed6b5be2021b1a4eaae221787bcb048ab2bcfd     -->
