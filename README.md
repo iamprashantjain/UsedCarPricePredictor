@@ -127,10 +127,10 @@
 20. Create docker image of the app using Dockerfile
 21. Test run it on local system, If runs successfully then add it to CI/CD pipeline
 
-    - FOR /F "tokens=*" %i IN ('docker ps -aq') DO docker rm -f %i & FOR /F "tokens=*" %i IN ('docker images -aq') DO docker rmi -f %i & FOR /F "tokens=*" %i IN ('docker volume ls -q') DO docker volume rm %i & docker system prune -a --volumes --force
+    - docker system prune -a --volumes -f
     - docker build -t used-car-price-container . && docker run -it -p 8000:8000 --rm --name used-car-container -e DAGSHUB_PAT=7bed6b5be2021b1a4eaae221787bcb048ab2bcfd used-car-price-container
 
-22. Add Creating Docker image and push image to Docker in CI
+22. Add Docker image creation and push image to Docker in CI
     - login ecr, build image, tag & push (as per show push commands)
 
 
@@ -247,6 +247,6 @@
 11. Keep same folder structure in docker image also to find every file using same code
 12. api app should have home route ("/") because aws uses that to validate
 13. App needs some time to fully start like downloading model from mlflow etc, but health checks happen immediately thats why target group health check fails -- add wait_for_health.sh & update cicd zip
-
+14. Always test docker app locally before putting it on aws to be sure that everything works
 
 <!-- 7bed6b5be2021b1a4eaae221787bcb048ab2bcfd     -->
