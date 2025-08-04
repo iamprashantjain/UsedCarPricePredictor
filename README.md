@@ -127,7 +127,7 @@
 20. Create docker image of the app using Dockerfile
 21. Test run it on local system, If runs successfully then add it to CI/CD pipeline
 
-    - docker system prune -a --volumes -f
+    - docker stop $(docker ps -aq) && docker rm -f $(docker ps -aq) && docker system prune -a --volumes -f
     - docker build -t used-car-price-container . && docker run -it -p 8000:8000 --rm --name used-car-container -e DAGSHUB_PAT=7bed6b5be2021b1a4eaae221787bcb048ab2bcfd used-car-price-container
 
 22. Add Docker image creation and push image to Docker in CI
@@ -201,6 +201,8 @@
         - start_docker.sh
     6. once we push changes to git, It will trigger ci/cd and app will be deployed and ready to serve
 
+
+![alt text](image-1.png)
 
 
 **In Summary**
